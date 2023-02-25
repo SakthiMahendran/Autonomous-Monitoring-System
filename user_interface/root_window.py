@@ -1,11 +1,13 @@
 import tkinter as tk
 from PIL import Image, ImageTk
-from user_interface.add_cam_window import AddCamWindow
 
 
 class RootWindow(tk.Tk):
     def __init__(self):
         super().__init__()
+
+        self.cam_data = dict()
+        self.selected_cam_index = -1
 
         self.geometry("900x650")
         self.resizable(False, False)
@@ -14,7 +16,7 @@ class RootWindow(tk.Tk):
         self.__render_image_label()
         self.__render_scan_facebtn()
         self.__render_add_cambtn()
-        self.__render_changecambtn()
+        self.__render_selectcambtn()
 
     def __render_image_label(self):
         image = Image.open("assets/no_cam.jpg")
@@ -28,12 +30,32 @@ class RootWindow(tk.Tk):
         self.__scanFaceBtn.place(relx=0.35, rely=0.85)
 
     def __render_add_cambtn(self):
+        from user_interface.add_cam_window import AddCamWindow
+
         self.__addCamBtn = tk.Button(self, text='Add New Camera', command=lambda: AddCamWindow(self))
         self.__addCamBtn.place(relx=0.44, rely=0.85)
 
-    def __render_changecambtn(self):
-        self.__camList = tk.Button(self, text='Change Camera')
+    def __render_selectcambtn(self):
+        self.__camList = tk.Button(self, text='Select Camera', command=lambda: self.__show_select_window())
         self.__camList.place(relx=0.58, rely=0.85)
+
+    def __show_select_window(self):
+        from user_interface.select_cam_window import SelectCamWindow
+
+        selected_cam = list(self.cam_data.keys())
+
+        if not selected_cam:
+            SelectCamWindow(self)
+        else:
+            SelectCamWindow(self)
+
+    def add_cam(self, camname: str, username: str, password: str, protocol: str, ip: str, port: str, stream: str):
+        if username == "" or password == "":
+            cam_url = f"{protocol}://{ip}:{port}/{stream}"
+        else:
+            cam_url = f"{protocol}://{username}:{password}@{ip}:{protocol}/{stream}"
+
+        self.cam_data[camname] = cam_url
 
     def show_and_run(self):
         self.mainloop()
