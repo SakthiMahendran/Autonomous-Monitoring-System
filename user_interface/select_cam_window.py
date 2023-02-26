@@ -27,8 +27,9 @@ class SelectCamWindow(tk.Toplevel):
         self.camera_listbox.pack(fill=tk.BOTH, padx=5, pady=5, expand=True)
 
     def __create_select_camera_button(self):
-        self.select_camera_button = tk.Button(self, text="Select Camera", command=lambda: self.destroy())
+        self.select_camera_button = tk.Button(self, text="Select Camera", command=self.__on_select_btn_clicked)
         self.select_camera_button.pack(padx=5, pady=5)
+        self.select_camera_button.configure(state=tk.DISABLED)
 
     def __add_elements_to_camera_list(self):
         self.cameras = list(self.root_window.cam_data.keys())
@@ -42,10 +43,16 @@ class SelectCamWindow(tk.Toplevel):
         for cam in self.cameras:
             self.camera_listbox.insert(tk.END, cam)
 
-        self.camera_listbox.bind("<<ListboxSelect>>", self.__on_select)
+        self.camera_listbox.bind("<<ListboxSelect>>", lambda event: self.__on_select())
 
-    def __on_select(self, event):
-        widget = event.widget
-        selection = widget.curselection()
-        if selection:
-            self.root_window.selected_cam_index = selection[0]
+    def __on_select(self):
+        self.select_camera_button.configure(state=tk.NORMAL)
+
+    def __on_select_btn_clicked(self):
+        selection_index = self.camera_listbox.curselection()[0]
+        if selection_index:
+            if self.root_window.selected_cam_index != selection_index:
+                self.root_window.selected_cam_index = selection_index
+                self.root_window.change_cam()
+
+        self.destroy()

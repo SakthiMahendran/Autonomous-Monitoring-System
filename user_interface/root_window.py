@@ -57,5 +57,7 @@ class RootWindow(tk.Tk):
 
         self.cam_data[camname] = cam_url
 
+    def change_cam(self):
+        print("Camera changed to", self.selected_cam_index)
     def show_and_run(self):
         self.mainloop()
