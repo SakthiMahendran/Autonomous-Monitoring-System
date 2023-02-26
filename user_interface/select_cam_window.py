@@ -49,17 +49,12 @@ class SelectCamWindow(tk.Toplevel):
         self.select_camera_button.configure(state=tk.NORMAL)
 
     def __on_select_btn_clicked(self):
-        print("On Select")
         selection_index = self.camera_listbox.curselection()[0]
-
-        print("selected index is", selection_index)
-        print("root window selected is", self.root_window.selected_cam_index)
 
         if selection_index != self.root_window.selected_cam_index:
             self.root_window.selected_cam_index = selection_index
             self.root_window.change_cam()
 
-            # Start a new thread to display the camera image
             self.image_thread = threading.Thread(target=self.root_window.display_cam_image)
             self.image_thread.daemon = True
             self.image_thread.start()

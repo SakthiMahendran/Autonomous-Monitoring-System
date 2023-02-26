@@ -9,6 +9,7 @@ class RootWindow(tk.Tk):
     def __init__(self):
         super().__init__()
 
+        self.is_change_cam = False
         self.cam_data = dict()
         self.selected_cam_index = -1
         self.cam_manager = IPCamManager()
