@@ -1,14 +1,14 @@
+import threading
 import tkinter as tk
 from user_interface.root_window import RootWindow
-
 
 class SelectCamWindow(tk.Toplevel):
     def __init__(self, root: RootWindow):
         super().__init__()
 
         self.root_window = root
-        # self.cameras = cameras
         self.selected_cam = None
+        self.cameras = []
 
         self.title("Select Camera")
         self.geometry("300x300")
@@ -49,10 +49,19 @@ class SelectCamWindow(tk.Toplevel):
         self.select_camera_button.configure(state=tk.NORMAL)
 
     def __on_select_btn_clicked(self):
+        print("On Select")
         selection_index = self.camera_listbox.curselection()[0]
-        if selection_index:
-            if self.root_window.selected_cam_index != selection_index:
-                self.root_window.selected_cam_index = selection_index
-                self.root_window.change_cam()
+
+        print("selected index is", selection_index)
+        print("root window selected is", self.root_window.selected_cam_index)
+
+        if selection_index != self.root_window.selected_cam_index:
+            self.root_window.selected_cam_index = selection_index
+            self.root_window.change_cam()
+
+            # Start a new thread to display the camera image
+            self.image_thread = threading.Thread(target=self.root_window.display_cam_image)
+            self.image_thread.daemon = True
+            self.image_thread.start()
 
         self.destroy()

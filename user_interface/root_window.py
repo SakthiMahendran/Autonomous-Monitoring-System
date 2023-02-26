@@ -1,6 +1,9 @@
 import tkinter as tk
+import time
+
 from PIL import Image, ImageTk
 
+from computer_vision.ip_cam_manager import IPCamManager
 
 class RootWindow(tk.Tk):
     def __init__(self):
@@ -8,8 +11,9 @@ class RootWindow(tk.Tk):
 
         self.cam_data = dict()
         self.selected_cam_index = -1
+        self.cam_manager = IPCamManager()
 
-        self.geometry("900x650")
+        self.geometry("800x650")
         self.resizable(False, False)
         self.title("Autonomous Monitoring System")
 
@@ -55,9 +59,25 @@ class RootWindow(tk.Tk):
         else:
             cam_url = f"{protocol}://{username}:{password}@{ip}:{protocol}/{stream}"
 
+        if not self.cam_manager.set_cam(camname, cam_url):
+            return
+
         self.cam_data[camname] = cam_url
+
 
     def change_cam(self):
         print("Camera changed to", self.selected_cam_index)
+
+    def display_cam_image(self):
+        cam = self.cam_manager.get_cam(self.selected_cam_index)
+        while True:
+            frame = cam.get_frame()
+
+            photo = ImageTk.PhotoImage(frame)
+            self.__imgLabel.configure(image=photo)
+            self.__imgLabel.image = photo
+
+            time.sleep(0.03)
+
     def show_and_run(self):
         self.mainloop()
