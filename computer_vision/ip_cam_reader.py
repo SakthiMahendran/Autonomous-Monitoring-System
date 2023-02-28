@@ -20,7 +20,7 @@ class IPCamReader:
             res, frame = self.video_stream.read()
             frame = cv2.resize(frame, (500, 500))
 
-            frame = img_processor.detect_faces(frame)
+            frame = img_processor.process_image(frame)
 
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
