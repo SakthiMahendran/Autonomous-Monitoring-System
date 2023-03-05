@@ -2,6 +2,7 @@ import threading
 import tkinter as tk
 from user_interface.root_window import RootWindow
 
+
 class SelectCamWindow(tk.Toplevel):
     def __init__(self, root: RootWindow):
         super().__init__()

@@ -5,6 +5,7 @@ from PIL import Image, ImageTk
 
 from computer_vision.ip_cam_manager import IPCamManager
 
+
 class RootWindow(tk.Tk):
     def __init__(self):
         super().__init__()
@@ -31,7 +32,8 @@ class RootWindow(tk.Tk):
         self.__imgLabel.place(relx=0.5, rely=0.2, anchor='center')
 
     def __render_scan_facebtn(self):
-        self.__scanFaceBtn = tk.Button(self, text='Scan Face')
+        from user_interface.scan_face_window import ScanFaceWindow
+        self.__scanFaceBtn = tk.Button(self, text='Scan Face', command=lambda: ScanFaceWindow(self, self.cam_manager.get_cam(self.selected_cam_index)))
         self.__scanFaceBtn.place(relx=0.35, rely=0.85)
 
     def __render_add_cambtn(self):
@@ -65,14 +67,13 @@ class RootWindow(tk.Tk):
 
         self.cam_data[camname] = cam_url
 
-
     def change_cam(self):
         print("Camera changed to", self.selected_cam_index)
 
     def display_cam_image(self):
-        cam = self.cam_manager.get_cam(self.selected_cam_index)
+
         while True:
-            frame = cam.get_frame()
+            frame = self.cam_manager.get_cam(self.selected_cam_index).get_frame()
 
             photo = ImageTk.PhotoImage(frame)
             self.__imgLabel.configure(image=photo)

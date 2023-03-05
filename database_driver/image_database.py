@@ -52,4 +52,3 @@ class ImageDatabase:
         unknown_path = os.path.join(self.IMAGE_DATABASE_PATH, "unknown")
         if not os.path.isdir(unknown_path):
             os.makedirs(unknown_path)
-

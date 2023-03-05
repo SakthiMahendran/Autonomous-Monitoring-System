@@ -4,7 +4,7 @@ from user_interface.root_window import RootWindow
 
 class AddCamWindow(tk.Toplevel):
     def __init__(self, root: RootWindow):
-        super().__init__()
+        super().__init__(root)
         self.root_window = root
 
         self.title("Add Camera")
@@ -77,5 +77,4 @@ class AddCamWindow(tk.Toplevel):
         port = self.port_entry.get()
         stream = self.stream_entry.get()
 
-        self.root_window.add_cam(cam_name, username, password,protocol, ip, port, stream)
-
+        self.root_window.add_cam(cam_name, username, password, protocol, ip, port, stream)

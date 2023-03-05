@@ -1,9 +1,8 @@
-import time
-
 import PIL.Image
 import cv2
 
 from computer_vision.image_processor import ImageProcessor
+
 
 class IPCamReader:
 
@@ -12,6 +11,7 @@ class IPCamReader:
         self.cam_name = cam_name
         self.cam_url = cam_url
         self.current_frame = PIL.Image.Image
+        self.isFaceMash = False
 
     def start_processing(self):
         img_processor = ImageProcessor()
@@ -19,9 +19,7 @@ class IPCamReader:
         while True:
             res, frame = self.video_stream.read()
             frame = cv2.resize(frame, (500, 500))
-
             frame = img_processor.process_image(frame)
-
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
             if res:
@@ -30,7 +28,6 @@ class IPCamReader:
             # time.sleep(0.03)
 
     def set_frame(self, mat: cv2.Mat):
-        # rgb_image = cv2.cvtColor(mat, cv2.COLOR_BGR2RGB)
         image = PIL.Image.fromarray(mat)
         self.current_frame = image.copy()
 
