@@ -1,6 +1,7 @@
 import tkinter as tk
 import time
 
+import PIL.Image
 from PIL import Image, ImageTk
 
 from computer_vision.ip_cam_manager import IPCamManager
@@ -73,7 +74,8 @@ class RootWindow(tk.Tk):
     def display_cam_image(self):
 
         while True:
-            frame = self.cam_manager.get_cam(self.selected_cam_index).get_frame()
+            mat = self.cam_manager.get_cam(self.selected_cam_index).get_frame()
+            frame = PIL.Image.fromarray(mat)
 
             photo = ImageTk.PhotoImage(frame)
             self.__imgLabel.configure(image=photo)

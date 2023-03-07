@@ -10,8 +10,8 @@ class IPCamReader:
         self.video_stream = video_stream
         self.cam_name = cam_name
         self.cam_url = cam_url
-        self.current_frame = PIL.Image.Image
-        self.isFaceMash = True
+        self.current_frame = cv2.Mat
+        self.isFaceMash = False
 
     def __del__(self):
         self.video_stream.release()
@@ -34,8 +34,7 @@ class IPCamReader:
                 self.__set_frame(frame)
 
     def __set_frame(self, mat: cv2.Mat):
-        image = PIL.Image.fromarray(mat)
-        self.current_frame = image.copy()
+        self.current_frame = mat
 
     def get_frame(self) -> PIL.Image.Image:
         return self.current_frame.copy()
