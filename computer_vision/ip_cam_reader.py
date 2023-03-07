@@ -11,23 +11,29 @@ class IPCamReader:
         self.cam_name = cam_name
         self.cam_url = cam_url
         self.current_frame = PIL.Image.Image
-        self.isFaceMash = False
+        self.isFaceMash = True
+
+    def __del__(self):
+        self.video_stream.release()
 
     def start_processing(self):
         img_processor = ImageProcessor()
 
-        while True:
+        while self.video_stream.isOpened():
             res, frame = self.video_stream.read()
             frame = cv2.resize(frame, (500, 500))
-            frame = img_processor.process_image(frame)
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+            if self.isFaceMash:
+                frame = img_processor.draw_facemesh(frame)
+            else:
+                frame = img_processor.draw_facebox(frame)
+                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
 
             if res:
-                self.set_frame(frame)
+                self.__set_frame(frame)
 
-            # time.sleep(0.03)
-
-    def set_frame(self, mat: cv2.Mat):
+    def __set_frame(self, mat: cv2.Mat):
         image = PIL.Image.fromarray(mat)
         self.current_frame = image.copy()
 

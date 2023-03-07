@@ -9,16 +9,27 @@ from database_driver.image_database import ImageData
 
 
 class ImageProcessor:
+    known_faces = List[ImageData]
+
     def __init__(self):
-        self.mp_face_detection = mp.solutions.face_detection.FaceDetection(min_detection_confidence=0.60)
+        self.mp_face_detection = mp.solutions.face_detection.FaceDetection(min_detection_confidence=0.6)
+        self.mp_face_mesh = mp.solutions.face_mesh.FaceMesh(static_image_mode=True,
+                                                            refine_landmarks=True,
+                                                            min_detection_confidence=0.6,
+                                                            min_tracking_confidence=0.6)
+        self.mp_drawing = mp.solutions.drawing_utils
+        self.drawing_spec = self.mp_drawing.DrawingSpec(self.mp_drawing.GREEN_COLOR, 3, 1)
         self.img_database_driver = ImageDatabase()
-        self.known_faces = self.img_database_driver.load_known_images()
 
         self.__green_color = (0, 255, 0)
         self.__red_color = (0, 0, 255)
         self.__orange_color = (0, 147, 238)
 
-    def process_image(self, frame: cv2.Mat) -> cv2.Mat:
+    def __del__(self):
+        self.mp_face_detection.close()
+        self.mp_face_mesh.close()
+
+    def draw_facebox(self, frame: cv2.Mat) -> cv2.Mat:
         # Convert the input frame from BGR (OpenCV's default) to RGB
         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
@@ -29,7 +40,7 @@ class ImageProcessor:
         bgr_frame = cv2.cvtColor(rgb_frame, cv2.COLOR_RGB2BGR)
 
         # Get the faces as numpy arrays
-        faces = self.__detect_faces(results, bgr_frame)
+        faces = ImageProcessor.__detect_faces(results, bgr_frame)
 
         # Recognize the faces
         recognized_faces = self.__recognize_faces(faces)
@@ -51,7 +62,22 @@ class ImageProcessor:
                     cv2.putText(bgr_frame, name, (left, top - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, self.__green_color, 2)
         return bgr_frame
 
-    def __recognize_faces(self, faces: list) -> list:
+    def draw_facemesh(self, frame: cv2.Mat):
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+        results = self.mp_face_mesh.process(frame)
+        if results.multi_face_landmarks:
+            for face_landmarks in results.multi_face_landmarks:
+                self.mp_drawing.draw_landmarks(
+                    image=frame,
+                    landmark_list=face_landmarks,
+                    connections=mp.solutions.face_mesh_connections.FACEMESH_TESSELATION,
+                    connection_drawing_spec=self.drawing_spec)
+
+        return frame
+
+    @staticmethod
+    def __recognize_faces(faces: list) -> list:
         recognized_faces = []
         for face in faces:
             if face is not None:
@@ -62,17 +88,18 @@ class ImageProcessor:
                     recognized_faces.append({'location': location, 'name': "Detected"})
                     continue
 
-                matches = face_recognition.compare_faces(self.__get_all_encodings(self.known_faces), encoding[0])
+                matches = face_recognition.compare_faces(ImageProcessor.__get_all_encodings(ImageProcessor.known_faces), encoding[0])
                 name = None
                 if True in matches:
                     face_index = matches.index(True)
-                    name = self.known_faces[face_index].image_name
+                    name = ImageProcessor.known_faces[face_index].image_name
                 recognized_faces.append({'location': location, 'name': name})
             else:
                 recognized_faces.append(None)
         return recognized_faces
 
-    def __detect_faces(self, results, frame):
+    @staticmethod
+    def __detect_faces(results, frame):
         increased_size = 25
         faces = []
         if results.detections:
@@ -89,7 +116,8 @@ class ImageProcessor:
                 faces.append(face)
         return faces
 
-    def __get_all_encodings(self, image_data: List[ImageData]):
+    @staticmethod
+    def __get_all_encodings(image_data: List[ImageData]):
         img_encodings = []
         for i in image_data:
             img_encodings.append(i.image_encoding)
