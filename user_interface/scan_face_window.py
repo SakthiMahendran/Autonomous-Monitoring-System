@@ -69,29 +69,34 @@ class ScanFaceWindow(tk.Toplevel):
             time.sleep(0.03)
 
     def __on_scan(self):
-        self.ipc_reader.isFaceMash = False
+        def process():
+            self.ipc_reader.isFaceMash = False
 
-        while True:
-            mat = self.ipc_reader.get_frame()
-            frame = PIL.Image.fromarray(mat)
-            photo = ImageTk.PhotoImage(frame)
-            self.__image_label.configure(image=photo)
-            self.__image_label.image = photo
+            while True:
+                mat = self.ipc_reader.get_frame()
+                frame = PIL.Image.fromarray(mat)
+                photo = ImageTk.PhotoImage(frame)
+                self.__image_label.configure(image=photo)
+                self.__image_label.image = photo
 
-            face_name = self.name_entry.get()
-            face_img = self.image_processor.get_face(self.ipc_reader.get_frame())
-            if face_img is None:
-                print("face_img is none")
-                continue
+                face_name = self.name_entry.get()
+                face_img = self.image_processor.get_face(self.ipc_reader.get_frame())
+                if face_img is None:
+                    print("face_img is none")
+                    continue
 
-            face_encoding = self.image_processor.get_encoding(face_img)
-            if face_encoding is None:
-                print("face_encoding is none")
-                continue
+                face_encoding = self.image_processor.get_encoding(face_img)
+                if face_encoding is None:
+                    print("face_encoding is none")
+                    continue
 
-            face_data = ImageData(face_name, face_img, face_encoding)
+                face_data = ImageData(face_name, face_img, face_encoding)
 
-            ImageProcessor.known_faces.append(face_data)
-            self.database_driver.save_known_image(face_data)
+                ImageProcessor.known_faces.append(face_data)
+                self.database_driver.save_known_image(face_data)
 
-            self.destroy()
+                self.destroy()
+
+        scanning_thread = threading.Thread(target=process)
+        scanning_thread.daemon = True
+        scanning_thread.start()

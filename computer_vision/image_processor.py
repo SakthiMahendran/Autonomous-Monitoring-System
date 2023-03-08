@@ -26,6 +26,7 @@ class ImageProcessor:
         self.__orange_color = (0, 147, 238)
 
         ImageProcessor.known_faces = self.img_database_driver.load_known_images()
+
     def __del__(self):
         self.mp_face_detection.close()
         self.mp_face_mesh.close()
@@ -101,7 +102,7 @@ class ImageProcessor:
             return None
 
         # Get the encoding of the face using face_recognition library
-        encoding = face_recognition.face_encodings(face)
+        encoding = face_recognition.face_encodings(face, model="large")
 
         return encoding[0] if len(encoding) > 0 else None
 
