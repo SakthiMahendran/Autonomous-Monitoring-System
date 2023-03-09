@@ -80,16 +80,13 @@ class ScanFaceWindow(tk.Toplevel):
                 self.__image_label.image = photo
 
                 face_name = self.name_entry.get()
-                face_img = self.image_processor.get_face(self.ipc_reader.get_frame())
-                if face_img is None:
-                    print("face_img is none")
+
+                meta_data = self.image_processor.scan_face(mat)
+                if meta_data is None:
+                    print("meta_data is none")
                     continue
 
-                face_encoding = self.image_processor.get_encoding(face_img)
-                if face_encoding is None:
-                    print("face_encoding is none")
-                    continue
-
+                face_img, face_encoding = meta_data
                 face_data = ImageData(face_name, face_img, face_encoding)
 
                 ImageProcessor.known_faces.append(face_data)

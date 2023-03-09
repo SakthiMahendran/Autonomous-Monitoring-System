@@ -78,7 +78,7 @@ class ImageProcessor:
 
         return frame
 
-    def get_face(self, frame: cv2.Mat):
+    def scan_face(self, frame: cv2.Mat):
         # Convert the input frame from BGR (OpenCV's default) to RGB
         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
@@ -90,33 +90,30 @@ class ImageProcessor:
 
         # Get the faces as numpy arrays
         faces = ImageProcessor.__detect_faces(results, bgr_frame)
+        if len(faces) == 0:
+            return None
 
-        # There should only be one face in the list, so return it (or None if there are no faces)
-        return faces[0]['image'] if len(faces) > 0 else None
-
-    def get_encoding(self, frame: cv2.Mat):
-        # Get the face from the frame
-        face = self.get_face(frame)
-
+        face = faces[0]
         if face is None:
             return None
 
-        # Get the encoding of the face using face_recognition library
-        encoding = face_recognition.face_encodings(face, model="large")
+        face_encoding = face_recognition.face_encodings(face['image'], [face['location']], model='small')
+        if len(face_encoding) == 0:
+            return None
 
-        return encoding[0] if len(encoding) > 0 else None
+        # There should only be one face in the list, so return it (or None if there are no faces)
+        return [face['image'], face_encoding[0]]
 
     @staticmethod
     def __detect_faces(results, frame):
-        increased_size = 25
         faces = []
         if results.detections:
             for detection in results.detections:
                 bbox = detection.location_data.relative_bounding_box
                 height, width, _ = frame.shape
 
-                y_min = int(bbox.ymin * height) - increased_size
-                y_max = int((bbox.ymin + bbox.height) * height) + increased_size
+                y_min = int(bbox.ymin * height)
+                y_max = int((bbox.ymin + bbox.height) * height)
                 x_min = int(bbox.xmin * width)
                 x_max = int((bbox.xmin + bbox.width) * width)
 
