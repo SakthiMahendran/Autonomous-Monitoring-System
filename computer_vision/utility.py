@@ -17,6 +17,8 @@ class Utility:
     from_addr = "autonomousmonitoringsystem@gmail.com"
     to_addr = "kingsakthi2005@gmail.com"
 
+    is_speaking = False
+
     def send_mail(self, face: cv2.Mat, face_name: str, cam_name: str):
         def process():
             time_now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -58,6 +60,11 @@ class Utility:
 
     def say(self, face_name: str, cam_name: str):
         def process():
+            while self.is_speaking:
+                pass
+
+            self.is_speaking = True
+
             # Generate a message
             time_now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             message = f"A face has been detected on {cam_name} camera at {time_now} and identified as {face_name}."
@@ -73,6 +80,8 @@ class Utility:
             # Speak the message
             engine.say(message)
             engine.runAndWait()
+
+            self.is_speaking = False
 
         speaking_thread = threading.Thread(target=process)
         speaking_thread.daemon = True
