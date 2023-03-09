@@ -4,6 +4,8 @@ from email.mime.text import MIMEText
 import cv2
 import datetime
 import smtplib
+import pyttsx3
+
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 
@@ -15,8 +17,7 @@ class Utility:
     from_addr = "autonomousmonitoringsystem@gmail.com"
     to_addr = "kingsakthi2005@gmail.com"
 
-    @staticmethod
-    def send_mail(face: cv2.Mat, face_name: str, cam_name: str):
+    def send_mail(self, face: cv2.Mat, face_name: str, cam_name: str):
         def process():
             time_now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             subject = f"Face Detected"
@@ -54,3 +55,25 @@ class Utility:
         mail_thread = threading.Thread(target=process)
         mail_thread.daemon = True
         mail_thread.start()
+
+    def say(self, face_name: str, cam_name: str):
+        def process():
+            # Generate a message
+            time_now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            message = f"A face has been detected on {cam_name} camera at {time_now} and identified as {face_name}."
+
+            # Initialize the TTS engine
+            engine = pyttsx3.init()
+
+            # Set the voice and speech rate
+            voices = engine.getProperty('voices')
+            engine.setProperty('voice', voices[0].id)  # Use the first voice
+            engine.setProperty('rate', 150)  # Set the speech rate to 150 words per minute
+
+            # Speak the message
+            engine.say(message)
+            engine.runAndWait()
+
+        speaking_thread = threading.Thread(target=process)
+        speaking_thread.daemon = True
+        speaking_thread.start()

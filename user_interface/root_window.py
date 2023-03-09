@@ -16,7 +16,7 @@ class RootWindow(tk.Tk):
         self.selected_cam_index = -1
         self.cam_manager = IPCamManager()
 
-        self.geometry("800x650")
+        self.geometry("800x600")
         self.resizable(False, False)
         self.title("Autonomous Monitoring System")
 
@@ -30,7 +30,7 @@ class RootWindow(tk.Tk):
         photo = ImageTk.PhotoImage(image)
         self.__imgLabel = tk.Label(self, image=photo)
         self.__imgLabel.image = photo
-        self.__imgLabel.place(relx=0.5, rely=0.2, anchor='center')
+        self.__imgLabel.place(relx=0.5, rely=0.3, anchor='center')
 
     def __render_scan_facebtn(self):
         from user_interface.scan_face_window import ScanFaceWindow

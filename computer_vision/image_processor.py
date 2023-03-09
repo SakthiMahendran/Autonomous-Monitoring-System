@@ -16,6 +16,8 @@ class ImageProcessor:
     def __init__(self):
         self.detected_faces = set()
 
+        self.util = Utility()
+
         self.mp_face_detection = mp.solutions.face_detection.FaceDetection(min_detection_confidence=0.6)
         self.mp_face_mesh = mp.solutions.face_mesh.FaceMesh(static_image_mode=True,
                                                             refine_landmarks=True,
@@ -71,7 +73,8 @@ class ImageProcessor:
                     cv2.putText(bgr_frame, name, (left, top - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, self.__green_color, 2)
 
         if name not in self.detected_faces and name != "":
-            Utility.send_mail(bgr_frame, name, cam_name)
+            self.util.send_mail(bgr_frame, name, cam_name)
+            self.util.say(name, cam_name)
             self.detected_faces.add(name)
 
         return bgr_frame
