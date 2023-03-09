@@ -6,7 +6,7 @@ import face_recognition
 
 from database_driver.image_database import ImageDatabase
 from database_driver.image_database import ImageData
-from database_driver.csv_database import CsvDatabase
+from database_driver.csv_database import TextDatabase
 
 from computer_vision.utility import Utility
 
@@ -29,7 +29,7 @@ class ImageProcessor:
         self.drawing_spec = self.mp_drawing.DrawingSpec(self.mp_drawing.GREEN_COLOR, 3, 1)
 
         self.img_database_driver = ImageDatabase()
-        self.csv_database_driver = CsvDatabase()
+        self.csv_database_driver = TextDatabase()
 
         self.__green_color = (0, 255, 0)
         self.__red_color = (0, 0, 255)
