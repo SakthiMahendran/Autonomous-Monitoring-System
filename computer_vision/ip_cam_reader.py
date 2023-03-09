@@ -18,20 +18,25 @@ class IPCamReader:
 
     def start_processing(self):
         img_processor = ImageProcessor()
+        processed_frames = []
 
-        while self.video_stream.isOpened():
-            res, frame = self.video_stream.read()
+        def process(frame: cv2.Mat):
             frame = cv2.resize(frame, (500, 500))
 
             if self.isFaceMash:
                 frame = img_processor.draw_facemesh(frame)
             else:
-                frame = img_processor.draw_facebox(frame)
+                frame = img_processor.draw_facebox(frame, self.cam_name)
                 frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
+            self.__set_frame(frame)
 
-            if res:
-                self.__set_frame(frame)
+        while self.video_stream.isOpened():
+            res, frame = self.video_stream.read()
+            if not res:
+                continue
+
+            process(frame)
 
     def __set_frame(self, mat: cv2.Mat):
         self.current_frame = mat

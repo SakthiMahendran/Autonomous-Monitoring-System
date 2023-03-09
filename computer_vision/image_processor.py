@@ -7,16 +7,21 @@ import face_recognition
 from database_driver.image_database import ImageDatabase
 from database_driver.image_database import ImageData
 
+from computer_vision.utility import Utility
+
 
 class ImageProcessor:
     known_faces = list()
 
     def __init__(self):
+        self.detected_faces = set()
+
         self.mp_face_detection = mp.solutions.face_detection.FaceDetection(min_detection_confidence=0.6)
         self.mp_face_mesh = mp.solutions.face_mesh.FaceMesh(static_image_mode=True,
                                                             refine_landmarks=True,
                                                             min_detection_confidence=0.6,
                                                             min_tracking_confidence=0.6)
+
         self.mp_drawing = mp.solutions.drawing_utils
         self.drawing_spec = self.mp_drawing.DrawingSpec(self.mp_drawing.GREEN_COLOR, 3, 1)
         self.img_database_driver = ImageDatabase()
@@ -31,7 +36,7 @@ class ImageProcessor:
         self.mp_face_detection.close()
         self.mp_face_mesh.close()
 
-    def draw_facebox(self, frame: cv2.Mat) -> cv2.Mat:
+    def draw_facebox(self, frame: cv2.Mat, cam_name: str) -> cv2.Mat:
         # Convert the input frame from BGR (OpenCV's default) to RGB
         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
@@ -46,6 +51,8 @@ class ImageProcessor:
 
         # Recognize the faces
         recognized_faces = self.__recognize_faces(faces)
+
+        name = ""
 
         # Draw rectangles around the recognized faces and add the name as text above the rectangle
         for i, face in enumerate(recognized_faces):
@@ -62,6 +69,11 @@ class ImageProcessor:
                 else:
                     cv2.rectangle(bgr_frame, (left, top), (right, bottom), self.__green_color, 2)
                     cv2.putText(bgr_frame, name, (left, top - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, self.__green_color, 2)
+
+        if name not in self.detected_faces and name != "":
+            Utility.send_mail(bgr_frame, name, cam_name)
+            self.detected_faces.add(name)
+
         return bgr_frame
 
     def draw_facemesh(self, frame: cv2.Mat):
@@ -106,16 +118,18 @@ class ImageProcessor:
 
     @staticmethod
     def __detect_faces(results, frame):
+        extra_height = 20
+        extra_weight = 10
         faces = []
         if results.detections:
             for detection in results.detections:
                 bbox = detection.location_data.relative_bounding_box
                 height, width, _ = frame.shape
 
-                y_min = int(bbox.ymin * height)
-                y_max = int((bbox.ymin + bbox.height) * height)
-                x_min = int(bbox.xmin * width)
-                x_max = int((bbox.xmin + bbox.width) * width)
+                y_min = int(bbox.ymin * height) - extra_height
+                y_max = int((bbox.ymin + bbox.height) * height) + extra_height
+                x_min = int(bbox.xmin * width) - extra_weight
+                x_max = int((bbox.xmin + bbox.width) * width) + extra_weight
 
                 face = {'location': (y_min, x_max, y_max, x_min), 'image': frame}
                 faces.append(face)
@@ -141,7 +155,9 @@ class ImageProcessor:
                     recognized_faces.append({'location': location, 'name': "Detected"})
                     continue
 
-                matches = face_recognition.compare_faces(ImageProcessor.__get_all_encodings(ImageProcessor.known_faces), encoding[0])
+                matches = face_recognition.compare_faces(ImageProcessor.__get_all_encodings(ImageProcessor.known_faces),
+                                                         encoding[0],
+                                                         tolerance=0.45)
                 name = None
                 if True in matches:
                     face_index = matches.index(True)
