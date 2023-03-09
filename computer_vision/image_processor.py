@@ -6,6 +6,7 @@ import face_recognition
 
 from database_driver.image_database import ImageDatabase
 from database_driver.image_database import ImageData
+from database_driver.csv_database import CsvDatabase
 
 from computer_vision.utility import Utility
 
@@ -26,7 +27,9 @@ class ImageProcessor:
 
         self.mp_drawing = mp.solutions.drawing_utils
         self.drawing_spec = self.mp_drawing.DrawingSpec(self.mp_drawing.GREEN_COLOR, 3, 1)
+
         self.img_database_driver = ImageDatabase()
+        self.csv_database_driver = CsvDatabase()
 
         self.__green_color = (0, 255, 0)
         self.__red_color = (0, 0, 255)
@@ -75,6 +78,9 @@ class ImageProcessor:
         if name not in self.detected_faces and name != "":
             self.util.send_mail(bgr_frame, name, cam_name)
             self.util.say(name, cam_name)
+
+            self.csv_database_driver.update_data(name, cam_name)
+
             self.detected_faces.add(name)
 
         return bgr_frame
@@ -160,7 +166,7 @@ class ImageProcessor:
 
                 matches = face_recognition.compare_faces(ImageProcessor.__get_all_encodings(ImageProcessor.known_faces),
                                                          encoding[0],
-                                                         tolerance=0.45)
+                                                         tolerance=0.50)
                 name = None
                 if True in matches:
                     face_index = matches.index(True)

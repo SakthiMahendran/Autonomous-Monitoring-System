@@ -7,12 +7,13 @@ from database_driver.image_data import ImageData
 
 class ImageDatabase:
     IMAGE_DATABASE_PATH = "database/images/"
+    FILE_EXTENSION = "face"
 
     def __init__(self):
         self._create_directories()
 
     def save_known_image(self, img_data: ImageData):
-        file_path = os.path.join(self.IMAGE_DATABASE_PATH, "known", f"{img_data.image_name}.jpr")
+        file_path = os.path.join(self.IMAGE_DATABASE_PATH, "known", f"{img_data.image_name}.{self.FILE_EXTENSION}")
         with open(file_path, "wb") as f:
             pickle.dump(img_data, f)
 
@@ -20,14 +21,14 @@ class ImageDatabase:
         known_path = os.path.join(self.IMAGE_DATABASE_PATH, "known")
         known_images = []
         for file_name in os.listdir(known_path):
-            if file_name.endswith(".jpr"):
+            if file_name.endswith(self.FILE_EXTENSION):
                 file_path = os.path.join(known_path, file_name)
                 with open(file_path, "rb") as f:
                     known_images.append(pickle.load(f))
         return known_images
 
     def save_unknown_images(self, img_data: ImageData):
-        file_path = os.path.join(self.IMAGE_DATABASE_PATH, "unknown", f"{img_data.image_name}.jpr")
+        file_path = os.path.join(self.IMAGE_DATABASE_PATH, "unknown", f"{img_data.image_name}.{self.FILE_EXTENSION}")
         with open(file_path, "wb") as f:
             pickle.dump(img_data, f)
 
@@ -35,7 +36,7 @@ class ImageDatabase:
         unknown_path = os.path.join(self.IMAGE_DATABASE_PATH, "unknown")
         unknown_images = []
         for file_name in os.listdir(unknown_path):
-            if file_name.endswith(".jpr"):
+            if file_name.endswith(self.FILE_EXTENSION):
                 file_path = os.path.join(unknown_path, file_name)
                 with open(file_path, "rb") as f:
                     unknown_images.append(pickle.load(f))
