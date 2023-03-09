@@ -19,6 +19,11 @@ class RootWindow(tk.Tk):
         self.geometry("800x600")
         self.resizable(False, False)
         self.title("Autonomous Monitoring System")
+        self.config(bg="#E2D1F9")
+
+        icon_file = "assets/icon.ico"
+        icon = ImageTk.PhotoImage(Image.open(icon_file))
+        self.iconphoto(True, icon)
 
         self.__render_image_label()
         self.__render_scan_facebtn()
@@ -28,23 +33,23 @@ class RootWindow(tk.Tk):
     def __render_image_label(self):
         image = Image.open("assets/no_cam.jpg")
         photo = ImageTk.PhotoImage(image)
-        self.__imgLabel = tk.Label(self, image=photo)
+        self.__imgLabel = tk.Label(self, image=photo, bg="black", width=510, height=510)
         self.__imgLabel.image = photo
-        self.__imgLabel.place(relx=0.5, rely=0.3, anchor='center')
+        self.__imgLabel.place(relx=0.5, rely=0.4, anchor='center')
 
     def __render_scan_facebtn(self):
         from user_interface.scan_face_window import ScanFaceWindow
-        self.__scanFaceBtn = tk.Button(self, text='Scan Face', command=lambda: ScanFaceWindow(self, self.cam_manager.get_cam(self.selected_cam_index)))
+        self.__scanFaceBtn = tk.Button(self, text='Scan Face', bg="#317773", fg="white", command=lambda: ScanFaceWindow(self, self.cam_manager.get_cam(self.selected_cam_index)))
         self.__scanFaceBtn.place(relx=0.35, rely=0.85)
 
     def __render_add_cambtn(self):
         from user_interface.add_cam_window import AddCamWindow
 
-        self.__addCamBtn = tk.Button(self, text='Add New Camera', command=lambda: AddCamWindow(self))
+        self.__addCamBtn = tk.Button(self, text='Add New Camera', bg="#317773", fg="white", command=lambda: AddCamWindow(self))
         self.__addCamBtn.place(relx=0.44, rely=0.85)
 
     def __render_selectcambtn(self):
-        self.__camList = tk.Button(self, text='Select Camera', command=lambda: self.__show_select_window())
+        self.__camList = tk.Button(self, text='Select Camera', bg="#317773", fg="white", command=lambda: self.__show_select_window())
         self.__camList.place(relx=0.58, rely=0.85)
 
     def __show_select_window(self):

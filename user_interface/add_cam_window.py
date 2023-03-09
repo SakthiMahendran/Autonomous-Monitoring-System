@@ -7,6 +7,7 @@ class AddCamWindow(tk.Toplevel):
         super().__init__(root)
         self.root_window = root
 
+        self.configure(bg="#E2D1F9")
         self.title("Add Camera")
         self.geometry("300x350")
         self.resizable(False, False)
@@ -65,7 +66,7 @@ class AddCamWindow(tk.Toplevel):
         self.stream_entry.grid(row=6, column=1, padx=5, pady=5)
 
     def __create_add_camera_button(self):
-        add_camera_button = tk.Button(self, text="Add Camera", command=self.__add_camera_action)
+        add_camera_button = tk.Button(self, text="Add Camera", command=self.__add_camera_action, fg="white", bg="#317773")
         add_camera_button.grid(row=7, column=1, padx=5, pady=5, sticky="n")
 
     def __add_camera_action(self):

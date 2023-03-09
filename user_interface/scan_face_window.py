@@ -17,11 +17,13 @@ class ScanFaceWindow(tk.Toplevel):
 
     def __init__(self, root: RootWindow, ipc_reader: IPCamReader):
         super().__init__(root)
+        self.protocol("WM_DELETE_WINDOW", self.__on_close)
 
         self.ipc_reader = ipc_reader
         self.database_driver = ImageDatabase()
         self.image_processor = ImageProcessor()
 
+        self.configure(bg="#E2D1F9")
         self.title("Scan Face")
         self.geometry("500x650")
         self.resizable(False, False)
@@ -34,23 +36,27 @@ class ScanFaceWindow(tk.Toplevel):
         self.__image_label.pack(expand=True, fill="both")
 
         # create a frame for the name entry
-        name_frame = tk.Frame(self, width=500, height=50)
+        name_frame = tk.Frame(self, width=500, height=50, bg="#E2D1F9")
         name_frame.pack(padx=10, pady=10, expand=True)
         name_frame.pack_propagate(False)  # prevent the frame from resizing
-        tk.Label(name_frame, text="Name:").pack(side="left")
+        tk.Label(name_frame, text="Name:").pack()
         self.name_entry = tk.Entry(name_frame)
-        self.name_entry.pack(side="left", padx=5)
+        self.name_entry.pack(padx=5)
 
         # create a frame for the buttons
-        button_frame = tk.Frame(self)
+        button_frame = tk.Frame(self, bg="#E2D1F9")
         button_frame.pack(padx=10, pady=10)
 
         # Add a space between the buttons
-        tk.Label(button_frame, text=" ").grid(row=0, column=0)
+        tk.Label(button_frame, text=" ", bg="#E2D1F9").grid(row=0, column=0)
 
         # Change the color of the buttons
-        tk.Button(button_frame, text="Cancel", command=self.destroy, bg="red", fg="white").grid(row=0, column=1, padx=5)
-        tk.Button(button_frame, text="Scan", command=self.__on_scan,bg="green", fg="white").grid(row=0, column=2, padx=5)
+        tk.Button(button_frame, text="Cancel", command=lambda: self.destroy(), bg="red", fg="white").grid(row=0,
+                                                                                                          column=1,
+                                                                                                          padx=5)
+        tk.Button(button_frame, text="Scan", command=lambda: self.__on_scan(), bg="green", fg="white").grid(row=0,
+                                                                                                            column=2,
+                                                                                                            padx=5)
 
         img_display_thread = threading.Thread(target=lambda: self.display_cam_image())
         img_display_thread.daemon = True
@@ -59,14 +65,22 @@ class ScanFaceWindow(tk.Toplevel):
     def display_cam_image(self):
         self.ipc_reader.isFaceMash = True
         while self.ipc_reader.isFaceMash:
-            mat = self.ipc_reader.get_frame()
-            frame = PIL.Image.fromarray(mat)
+            try:
+                mat = self.ipc_reader.get_frame()
+                frame = PIL.Image.fromarray(mat)
 
-            photo = ImageTk.PhotoImage(frame)
-            self.__image_label.configure(image=photo)
-            self.__image_label.image = photo
+                photo = ImageTk.PhotoImage(frame)
+                self.__image_label.configure(image=photo)
+                self.__image_label.image = photo
+
+            except:
+                pass
 
             time.sleep(0.03)
+
+    def __on_close(self):
+        self.ipc_reader.isFaceMash = False
+        self.destroy()
 
     def __on_scan(self):
         def process():

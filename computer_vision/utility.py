@@ -38,7 +38,7 @@ class Utility:
             message.attach(image)
 
             # Add a body to the email message
-            body = f"Hi,\n\nA face has been detected on {cam_name} camera at {time_now} and identified as {face_name}.\n\nPlease check the attached image for details.\n\nThanks"
+            body = f"Hi,\n\nA face has been detected on {cam_name} at {time_now} and identified as {face_name}.\n\nPlease check the attached image for details.\n\nThanks"
             text = MIMEText(body)
             message.attach(text)
 
@@ -67,7 +67,7 @@ class Utility:
 
             # Generate a message
             time_now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            message = f"A face has been detected on {cam_name} camera at {time_now} and identified as {face_name}."
+            message = f"A face has been detected on {cam_name} at {time_now} and identified as {face_name}."
 
             # Initialize the TTS engine
             engine = pyttsx3.init()

@@ -11,6 +11,7 @@ class SelectCamWindow(tk.Toplevel):
         self.selected_cam = None
         self.cameras = []
 
+        self.configure(bg="#E2D1F9")
         self.title("Select Camera")
         self.geometry("300x300")
         self.resizable(False, False)
@@ -28,7 +29,14 @@ class SelectCamWindow(tk.Toplevel):
         self.camera_listbox.pack(fill=tk.BOTH, padx=5, pady=5, expand=True)
 
     def __create_select_camera_button(self):
-        self.select_camera_button = tk.Button(self, text="Select Camera", command=self.__on_select_btn_clicked)
+        self.select_camera_button = tk.Button(self,
+                                              text="Select",
+                                              command=self.__on_select_btn_clicked,
+                                              fg="white",
+                                              bg="#317773",
+                                              disabledforeground="black",
+                                              )
+
         self.select_camera_button.pack(padx=5, pady=5)
         self.select_camera_button.configure(state=tk.DISABLED)
 
