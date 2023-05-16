@@ -4,9 +4,9 @@ import cv2
 import mediapipe as mp
 import face_recognition
 
-from database_driver.image_database import ImageDatabase
-from database_driver.image_database import ImageData
-from database_driver.csv_database import TextDatabase
+from database_driver import ImageDatabase
+from database_driver import ImageData
+from database_driver import TextDatabase
 
 from computer_vision.utility import Utility
 
@@ -42,24 +42,18 @@ class ImageProcessor:
         self.mp_face_mesh.close()
 
     def draw_facebox(self, frame: cv2.Mat, cam_name: str) -> cv2.Mat:
-        # Convert the input frame from BGR (OpenCV's default) to RGB
         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
-        # Detect all the faces in the frame using the MediaPipe Face Detection model
         results = self.mp_face_detection.process(rgb_frame)
 
-        # Convert the RGB frame to a BGR frame for OpenCV to display it properly
         bgr_frame = cv2.cvtColor(rgb_frame, cv2.COLOR_RGB2BGR)
 
-        # Get the faces as numpy arrays
         faces = ImageProcessor.__detect_faces(results, bgr_frame)
 
-        # Recognize the faces
         recognized_faces = self.__recognize_faces(faces)
 
         name = ""
 
-        # Draw rectangles around the recognized faces and add the name as text above the rectangle
         for i, face in enumerate(recognized_faces):
             if face is not None:
                 (top, right, bottom, left) = face['location']
@@ -85,31 +79,27 @@ class ImageProcessor:
 
         return bgr_frame
 
+
     def draw_facemesh(self, frame: cv2.Mat):
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
         results = self.mp_face_mesh.process(frame)
         if results.multi_face_landmarks:
+            height, width = frame.shape[0], frame.shape[1]
             for face_landmarks in results.multi_face_landmarks:
-                self.mp_drawing.draw_landmarks(
-                    image=frame,
-                    landmark_list=face_landmarks,
-                    connections=mp.solutions.face_mesh_connections.FACEMESH_TESSELATION,
-                    connection_drawing_spec=self.drawing_spec)
+                for landmark in face_landmarks.landmark:
+                    x = int(landmark.x * height)
+                    y = int(landmark.y * width)
+                    cv2.circle(frame, (x, y), 1, (0, 255, 0), -1)
 
         return frame
-
     def scan_face(self, frame: cv2.Mat):
-        # Convert the input frame from BGR (OpenCV's default) to RGB
         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
-        # Detect all the faces in the frame using the MediaPipe Face Detection model
         results = self.mp_face_detection.process(rgb_frame)
 
-        # Convert the RGB frame to a BGR frame for OpenCV to display it properly
         bgr_frame = cv2.cvtColor(rgb_frame, cv2.COLOR_RGB2BGR)
 
-        # Get the faces as numpy arrays
         faces = ImageProcessor.__detect_faces(results, bgr_frame)
         if len(faces) == 0:
             return None
@@ -122,7 +112,6 @@ class ImageProcessor:
         if len(face_encoding) == 0:
             return None
 
-        # There should only be one face in the list, so return it (or None if there are no faces)
         return [face['image'], face_encoding[0]]
 
     @staticmethod

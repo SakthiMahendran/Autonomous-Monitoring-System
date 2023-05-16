@@ -2,7 +2,7 @@ import os
 import pickle
 from typing import List
 
-from database_driver.image_data import ImageData
+from database_driver import ImageData
 
 
 class ImageDatabase:

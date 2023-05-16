@@ -4,7 +4,7 @@ import time
 import PIL.Image
 from PIL import Image, ImageTk
 
-from computer_vision.ip_cam_manager import IPCamManager
+from computer_vision import IPCamManager
 
 
 class RootWindow(tk.Tk):

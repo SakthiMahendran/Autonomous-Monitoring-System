@@ -1,7 +1,7 @@
 import PIL.Image
 import cv2
 
-from computer_vision.image_processor import ImageProcessor
+from computer_vision import ImageProcessor
 
 
 class IPCamReader:

@@ -5,11 +5,11 @@ import time
 import PIL.Image
 from PIL import ImageTk
 
-from computer_vision.ip_cam_reader import IPCamReader
-from computer_vision.image_processor import ImageProcessor
+from computer_vision import IPCamReader
+from computer_vision import ImageProcessor
 
-from database_driver.image_data import ImageData
-from database_driver.image_database import ImageDatabase
+from database_driver import ImageData
+from database_driver import ImageDatabase
 
 
 class ScanFaceWindow(tk.Toplevel):
@@ -28,29 +28,24 @@ class ScanFaceWindow(tk.Toplevel):
         self.geometry("500x650")
         self.resizable(False, False)
 
-        # create a frame for the image and label
         __image_frame = tk.Frame(self, width=500, height=500)
         __image_frame.pack(padx=10, pady=10, expand=True)
-        __image_frame.pack_propagate(False)  # prevent the frame from resizing
+        __image_frame.pack_propagate(False)
         self.__image_label = tk.Label(__image_frame, bg="white")
         self.__image_label.pack(expand=True, fill="both")
 
-        # create a frame for the name entry
         name_frame = tk.Frame(self, width=500, height=50, bg="#E2D1F9")
         name_frame.pack(padx=10, pady=10, expand=True)
-        name_frame.pack_propagate(False)  # prevent the frame from resizing
+        name_frame.pack_propagate(False)
         tk.Label(name_frame, text="Name:").pack()
         self.name_entry = tk.Entry(name_frame)
         self.name_entry.pack(padx=5)
 
-        # create a frame for the buttons
         button_frame = tk.Frame(self, bg="#E2D1F9")
         button_frame.pack(padx=10, pady=10)
 
-        # Add a space between the buttons
         tk.Label(button_frame, text=" ", bg="#E2D1F9").grid(row=0, column=0)
 
-        # Change the color of the buttons
         tk.Button(button_frame, text="Cancel", command=lambda: self.destroy(), bg="red", fg="white").grid(row=0,
                                                                                                           column=1,
                                                                                                           padx=5)

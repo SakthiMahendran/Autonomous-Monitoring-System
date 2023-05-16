@@ -1,5 +1,5 @@
 import tkinter as tk
-from user_interface.root_window import RootWindow
+from user_interface import RootWindow
 
 
 class AddCamWindow(tk.Toplevel):

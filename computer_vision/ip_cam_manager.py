@@ -1,6 +1,6 @@
 from threading import Thread
 
-from computer_vision.ip_cam_reader import IPCamReader
+from computer_vision import IPCamReader
 
 
 class IPCamManager:
